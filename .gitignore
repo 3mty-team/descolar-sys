@@ -1,0 +1,8 @@
+# Composer library
+/vendor
+
+#IDE files
+.idea
+
+# App directory
+/Lamp-Like/www/app/*

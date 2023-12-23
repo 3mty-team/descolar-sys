@@ -1,0 +1,17 @@
+version: '3.8'
+
+# Definition of services
+services:
+  lamp-like:
+    build:
+      context: .
+      dockerfile: Dockerfile_Lamp_Like
+    container_name: Lamp-like
+    restart: always
+    # Definition of ports
+    ports:
+      - "80:80"
+      - "443:443"
+    # Definition of volumes
+    volumes:
+      - ./www/app:/app
