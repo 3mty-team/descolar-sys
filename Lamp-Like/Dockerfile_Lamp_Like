@@ -29,3 +29,6 @@ RUN a2enmod rewrite remoteip && \
 
 # bash for update app source code
 COPY scripts/download_src.sh /download_src.sh
+
+# env file for update app source code
+COPY env/git.env /git.env

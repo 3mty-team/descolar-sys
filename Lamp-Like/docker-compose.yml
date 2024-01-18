@@ -6,7 +6,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile_Lamp_Like
-    container_name: Lamp-like
+    container_name: Lamp-Like
     restart: always
     # Definition of ports
     ports:
@@ -14,4 +14,4 @@ services:
       - "443:443"
     # Definition of volumes
     volumes:
-      - ./www/app:/app
+      - /opt/www:/app
