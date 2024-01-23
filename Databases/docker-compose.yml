@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  descolar-rec-db:
+    build:
+      context: .
+      dockerfile: Dockerfile_mariadb_instance
+    container_name: descolar-rec-db
+    ports:
+      - "3366:3306"
+    env_file: env/descolar-rec-db.env
+    volumes:
+      - /opt/database/descolar-rec:/var/lib/mysql
+    restart: always
+
+  descolar-prd-db:
+    build:
+      context: .
+      dockerfile: Dockerfile_mariadb_instance
+    container_name: descolar-prd-db
+    ports:
+      - "3367:3306"
+    env_file: env/descolar-prd-db.env
+    volumes:
+      - /opt/database/descolar-prd:/var/lib/mysql
+    restart: always
+
+  mod-rec-db:
+    build:
+      context: .
+      dockerfile: Dockerfile_mariadb_instance
+    container_name: mod-rec-db
+    ports:
+      - "3377:3306"
+    env_file: env/mod-rec-db.env
+    volumes:
+      - /opt/database/mod-rec:/var/lib/mysql
+    restart: always
+
+  mod-prd-db:
+    build:
+      context: .
+      dockerfile: Dockerfile_mariadb_instance
+    container_name: mod-prd-db
+    ports:
+      - "3378:3306"
+    env_file: env/mod-prd-db.env
+    volumes:
+      - /opt/database/mod-prd:/var/lib/mysql
+    restart: always

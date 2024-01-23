@@ -1,0 +1,6 @@
+FROM mariadb:latest
+
+# Installez le client MySQL
+# RUN apt-get install default-mysql-client -y && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && apt-get install -y mysql-client && rm -rf /var/lib/apt
