@@ -6,3 +6,6 @@
 
 # App directory
 /Lamp-Like/www/app/*
+
+# env file
+.env
