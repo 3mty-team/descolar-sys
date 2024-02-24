@@ -8,10 +8,18 @@ services:
       dockerfile: Dockerfile_Lamp_Like
     container_name: Lamp-Like
     restart: always
-    # Definition of ports
-    ports:
-      - "80:80"
-      - "443:443"
+    networks:
+      - descolar_internal_network
     # Definition of volumes
     volumes:
       - /opt/www:/app
+    # Definition of labels
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.lamp.rule=Host(`internal-api.descolar.fr`) && PathPrefix(`/v1`)"
+      - "traefik.http.routers.lamp.entrypoints=websecure"
+      - "traefik.http.routers.lamp.middlewares=strip-prefix"
+      - "traefik.http.middlewares.strip-prefix.stripprefix.prefixes=/v1"
+networks:
+  descolar_internal_network:
+    external: true
