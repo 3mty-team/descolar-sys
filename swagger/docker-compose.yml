@@ -1,0 +1,23 @@
+version: '3.8'
+
+# Definition of services
+services:
+  swagger:
+    build:
+      context: .
+      dockerfile: Dockerfile_Swagger
+    container_name: swagger
+    restart: always
+    networks:
+      - descolar_internal_network
+    # Definition of volumes
+    volumes:
+      - /opt/website:/app
+    # Definition of labels
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.swag.rule=Host(`internal-api.descolar.fr`)"
+      - "traefik.http.routers.swag.entrypoints=websecure"
+networks:
+  descolar_internal_network:
+    external: true
