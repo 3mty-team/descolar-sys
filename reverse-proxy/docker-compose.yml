@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  traefik:
+    image: "traefik:v2.10"
+    container_name: "traefik"
+    # Labels to securise the Traefik's dashboard access
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api.rule=Host(`traefik.descolar.fr`)"
+      - "traefik.http.routers.api.entrypoints=websecure"
+      - "traefik.http.routers.api.service=api@internal"
+      - "traefik.http.routers.api.middlewares=traefik-auth"
+      - "traefik.http.middlewares.traefik-auth.basicauth.removeheader=true"
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=descolar-reverse-proxy:$$2y$$05$$6Mgzr3AhoKmy7T5BVUMtb.SEH/dud/HTRJQA1eEuns.pKcIX0s6OW"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./traefik.toml:/etc/traefik/traefik.toml"
+      - "./letsencrypt:/letsencrypt"
+    restart: always
+    networks:
+        - descolar_internal_network
+networks:
+  descolar_internal_network:
+    external: true
