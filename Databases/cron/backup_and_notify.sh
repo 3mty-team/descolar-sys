@@ -3,6 +3,7 @@
 SCRIPT_DIR="/opt/cron"
 ENV_DIR="/opt/dcompose/database/env"
 BACKUP_DIR="/opt/backup"
+BACKUP_TEMP_DIR="/opt/backup/temp"
 
 # Charger les variables d'environnement depuis le fichier .env
 load_env_file() {
@@ -24,6 +25,7 @@ ARCHIVE_NAME="${DATE}.tar.gz"
 
 # Si on relance le script le même jour
 rm -r "$BACKUP_DIR/$DATE"*
+rm -r "$BACKUP_TEMP_DIR"
 
 send_discord_message() {
     local message="$1"
@@ -31,6 +33,8 @@ send_discord_message() {
 }
 
 mkdir -p "$BACKUP_DIR"
+mkdir -p "$BACKUP_TEMP_DIR"
+
 for INSTANCE in "descolar-rec-db"; # descolar-prd-db mod-rec-db mod-prd-db;
 do
     load_env_file "$INSTANCE"
@@ -45,7 +49,7 @@ do
     fi
 
     # Utiliser mysqldump avec le fichier de configuration dans le conteneur
-    docker exec -i $INSTANCE mysqldump --defaults-extra-file="/etc/mysql/conf.d/$INSTANCE.cnf" --column-statistics=0 "$MYSQL_DATABASE" > "$BACKUP_DIR/${DATE}_$INSTANCE.sql"
+    docker exec -i $INSTANCE mysqldump --defaults-extra-file="/etc/mysql/conf.d/$INSTANCE.cnf" --column-statistics=0 "$MYSQL_DATABASE" > "$BACKUP_TEMP_DIR/${DATE}_$INSTANCE.sql"
 
     if [ $? -ne 0 ]; then
         echo "Erreur lors de la sauvegarde de l'instance $INSTANCE."
@@ -54,15 +58,30 @@ do
     fi
 done
 
-cd "$BACKUP_DIR" && find . -name "${DATE}*.sql" -type f -exec tar -czvf "$BACKUP_DIR/$ARCHIVE_NAME" -C "$BACKUP_DIR" {} +
-
+cd "$BACKUP_TEMP_DIR" && find . -name "${DATE}*.sql" -type f -exec tar -czvf "$BACKUP_TEMP_DIR/dump_sql.tar.gz" -C "$BACKUP_TEMP_DIR" {} +
 if [ $? -ne 0 ]; then
     echo "Erreur lors de la création de l'archive."
     send_discord_message "Échec de la création de l'archive quotidienne."
     exit 1
 fi
 
-rm "$BACKUP_DIR/$DATE"*.sql
+rm "$BACKUP_TEMP_DIR/$DATE"*.sql
+
+tar -czvf "$BACKUP_TEMP_DIR/volumes.tar.gz" /opt/database
+if [ $? -ne 0 ]; then
+    echo "Erreur lors de la création de l'archive."
+    send_discord_message "Échec de la création de l'archive quotidienne."
+    exit 1
+fi
+
+tar -czvf "$BACKUP_DIR/$ARCHIVE_NAME" -C "$BACKUP_TEMP_DIR" .
+if [ $? -ne 0 ]; then
+    echo "Erreur lors de la création de l'archive."
+    send_discord_message "Échec de la création de l'archive quotidienne."
+    exit 1
+fi
+
+rm -r "$BACKUP_TEMP_DIR"
 
 cd "$SCRIPT_DIR" || exit 1
 
