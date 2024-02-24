@@ -12,7 +12,7 @@ services:
       - descolar_internal_network
     # Definition of volumes
     volumes:
-      - /opt/website:/app
+      - /opt/www:/app
     # Definition of labels
     labels:
       - "traefik.enable=true"
